@@ -3,4 +3,4 @@ Developed a web application using HTML, CSS, JavaScript, Node.js, and MongoDB to
 performance. Teachers can add student details, manage timetables, record marks, track attendance, and view 
 all records. Students can access their results, including marks and attendance. Ensured a user-friendly 
 system for efficient academic management.
-#images
+# images
