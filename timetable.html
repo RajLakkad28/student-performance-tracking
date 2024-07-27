@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .w3-sidebar {
+            height: 100%;
+            width: 250px;
+            background-color: #343a40;
+            color: #fff;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            display: none;
+        }
+        
+        .w3-sidebar a {
+            padding: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: 0.3s;
+        }
+        
+        .w3-sidebar a:hover {
+            background-color: #007bff;
+            color: #fff !important;
+        }
+        
+        .w3-sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            font-size: 24px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        
+        #main {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+        
+        @media screen and (max-height: 450px) {
+            .w3-sidebar {
+                padding-top: 15px;
+            }
+            .w3-sidebar a {
+                font-size: 16px;
+            }
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            margin-bottom: 1rem;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        th {
+            background-color: #343a40;
+            color: #fff;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        
+        td {
+            vertical-align: middle;
+            border-top: 1px solid #dee2e6;
+            font-size: 16px;
+        }
+        
+        td:hover {
+            background-color: #d9d9d9;
+            transition: background-color 0.3s ease;
+        }
+    </style>
+    <title>Marwadi University</title>
+</head>
+<body>
+
+<div class="w3-sidebar w3-bar-block w3-card w3-animate-left" id="mySidebar">
+    <button class="w3-bar-item w3-button w3-large close-btn" onclick="w3_close()">&times;</button>
+    <a href="time-table" class="w3-bar-item w3-button">Time Table</a>
+    <a href="add-marks" class="w3-bar-item w3-button">Add Marks</a>
+    <a href="/result" class="w3-bar-item w3-button">Result</a>
+    <a href="/register-student-page" class="w3-bar-item w3-button">Register a New Student</a>
+    <a href="/Attendance-page" class="w3-bar-item w3-button">Attendance</a>
+    <a href="/events" class="w3-bar-item w3-button">Events</a>
+</div>
+
+<div id="main">
+    <div class="w3-teal">
+        <button id="openNav" class="w3-button w3-teal w3-xlarge" onclick="w3_open()">&#9776;</button>
+        <div class="w3-container">
+            <h1></h1>
+        </div>
+    </div>
+
+    <main>
+        <h2>Timetable</h2>
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+            </tr>
+            <tr>
+                <td>7:30-8:25</td>
+                <td>SE</td>
+                <td>TOC</td>
+                <td>.NET</td>
+                <td>DV</td>
+                <td>ADF</td>
+            </tr>
+            <tr>
+                <td>8:25-9:20</td>
+                <td>SE</td>
+                <td>TOC</td>
+                <td>.NET</td>
+                <td>DV</td>
+                <td>ADF</td>
+            </tr>
+            <tr>
+                <td>9:20-9:30</td>
+                <td colspan="5">Break</td>
+            </tr>
+            <tr>
+                <td>9:30-10:25</td>
+                <td>SE</td>
+                <td>TOC</td>
+                <td>.NET</td>
+                <td>DV</td>
+                <td>ADF</td>
+            </tr>
+            <tr>
+                <td>10:25-11:20</td>
+                <td>SE</td>
+                <td>TOC</td>
+                <td>.NET</td>
+                <td>DV</td>
+                <td>ADF</td>
+            </tr>
+            <tr>
+                <td>11:20-11:40</td>
+                <td colspan="5">Break</td>
+            </tr>
+            <tr>
+                <td>11:40-12:35</td>
+                <td>SE</td>
+                <td>TOC</td>
+                <td>.NET</td>
+                <td>DV</td>
+                <td>ADF</td>
+            </tr>
+            <tr>
+                <td>12:35-1:30</td>
+                <td>SE</td>
+                <td>TOC</td>
+                <td>.NET</td>
+                <td>DV</td>
+                <td>ADF</td>
+            </tr>
+        </table>
+    </main>
+</div>
+
+<script>
+    function w3_open() {
+        document.getElementById("main").style.marginLeft = "250px";
+        document.getElementById("mySidebar").style.width = "250px";
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("openNav").style.display = 'none';
+    }
+    function w3_close() {
+        document.getElementById("main").style.marginLeft = "0";
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("openNav").style.display = "inline-block";
+    }
+</script>
+
+</body>
+</html>

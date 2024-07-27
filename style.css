@@ -1,0 +1,29 @@
+body {
+	font-family: Arial, sans-serif;
+}
+
+.form {
+	display: none;
+	margin-top: 20px;
+}
+
+button {
+	padding: 10px 20px;
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #45a049;
+}
+
+#studentForm, #addMarksForm {
+	width: 300px;
+}
+
+#studentList, #result {
+	width: 500px;
+}

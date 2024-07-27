@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Marwadi University</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .w3-sidebar {
+            height: 100%;
+            width: 250px;
+            background-color: #343a40;
+            color: #fff;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            display: none; /* Initially hidden */
+        }
+        
+        .w3-sidebar a {
+            padding: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: 0.3s;
+        }
+        
+        .w3-sidebar a:hover {
+            background-color: #007bff;
+            color: #fff !important;
+        }
+        
+        .w3-sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            font-size: 24px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        
+        #main {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+        
+        @media screen and (max-height: 450px) {
+            .w3-sidebar {
+                padding-top: 15px;
+            }
+            .w3-sidebar a {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="w3-sidebar w3-bar-block w3-card w3-animate-left" id="mySidebar">
+    <button class="w3-bar-item w3-button w3-large close-btn" onclick="w3_close()">&times;</button>
+    <a href="/time-table" class="w3-bar-item w3-button">Time Table</a>
+    <a href="/add-marks" class="w3-bar-item w3-button">Add Marks</a>
+    <a href="/result" class="w3-bar-item w3-button">Result</a>
+    <a href="/register-student-page" class="w3-bar-item w3-button">Register a New Student</a>
+    <a href="/Attendance-page" class="w3-bar-item w3-button">Attendance</a>
+    <a href="/events" class="w3-bar-item w3-button">Events</a>
+</div>
+
+<div id="main">
+    <div class="w3-teal">
+        <button id="openNav" class="w3-button w3-teal w3-xlarge" onclick="w3_open()">&#9776;</button>
+        <div class="w3-container">
+            <h1>Teacher Dashboard</h1>
+        </div>
+    </div>
+</div>
+
+<script>
+    function w3_open() {
+        document.getElementById("main").style.marginLeft = "250px";
+        document.getElementById("mySidebar").style.width = "250px";
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("openNav").style.display = 'none';
+    }
+    function w3_close() {
+        document.getElementById("main").style.marginLeft = "0";
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("openNav").style.display = "inline-block";
+    }
+</script>
+
+</body>
+</html>

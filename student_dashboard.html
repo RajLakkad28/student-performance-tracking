@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marwadi University - Teacher Dashboard</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .w3-sidebar {
+            height: 100%;
+            width: 250px;
+            background-color: #343a40;
+            color: #fff;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            display: none; /* Initially hidden */
+        }
+        
+        .w3-sidebar a {
+            padding: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: 0.3s;
+        }
+        
+        .w3-sidebar a:hover {
+            background-color: #007bff;
+            color: #fff !important;
+        }
+        
+        .w3-sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            font-size: 24px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        
+        #main {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+        
+        @media screen and (max-height: 450px) {
+            .w3-sidebar {
+                padding-top: 15px;
+            }
+            .w3-sidebar a {
+                font-size: 16px;
+            }
+        }
+
+        #predicted-performance {
+            font-size: 20px;
+            font-weight: bold;
+            color: green;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="w3-sidebar w3-bar-block w3-card w3-animate-left" id="mySidebar">
+    <button class="w3-bar-item w3-button w3-large close-btn" onclick="w3_close()">&times;</button>
+    <a href="/student-dashboard" class="w3-bar-item w3-button">Result</a>
+    <a href="/time-table1" class="w3-bar-item w3-button">Time Table</a>
+    
+</div>
+
+<div id="main">
+    <div class="w3-teal">
+        <button id="openNav" class="w3-button w3-teal w3-xlarge" onclick="w3_open()">&#9776;</button>
+        <div class="w3-container">
+            <h1>Result</h1>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h1 class="card-title">Student Marks, Attendance, and Events</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Mid1</th>
+                                        <th>Mid2</th>
+                                        <th>Average</th>
+                                        <th>ESE (out of 70)</th>
+                                        <th>Attendance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marks-attendance-container">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-6">
+                                        <div class="card bg-primary text-white text-center p-3">
+                                            <h5 class="card-title">Percentage</h5>
+                                            <p class="card-text" id="percentage"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container mt-5">
+                                <h3>Student participated Events</h3>
+                                <ul id="eventsList" class="list-group">
+                                </ul>
+                            </div>
+                        </div>
+                        <canvas id="marks-chart" width="100" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <p id="predicted-performance" class="text-center"></p>
+    </div>
+</div>
+
+<script>
+    function w3_open() {
+        document.getElementById("main").style.marginLeft = "250px";
+        document.getElementById("mySidebar").style.width = "250px";
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("openNav").style.display = 'none';
+    }
+    function w3_close() {
+        document.getElementById("main").style.marginLeft = "0";
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("openNav").style.display = "inline-block";
+    }
+
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: "/student-marks",
+            success: function (data) {
+                $('#marks-attendance-container').empty();
+                $.ajax({
+                    type: "GET",
+                    url: "/student-attendance",
+                    success: function (attendanceData) {
+                        var totalStudents = data.length;
+                        var averageSum = 0;
+                        var eseTotal = 0;
+                        var mid1Data = [];
+                        var mid2Data = [];
+                        var eseData = [];
+                        var subjects = [];
+                        var attendanceSum = 0;
+                        data.forEach(function (mark, index) {
+                            var average = Math.round((mark.mid1 + mark.mid2) / 2);
+                            var attendance = parseInt(attendanceData[index] ? attendanceData[index].attendance : 0);
+                            var row = $('<tr>').append(
+                                $('<td>').text(mark.subject),
+                                $('<td>').text(mark.mid1),
+                                $('<td>').text(mark.mid2),
+                                $('<td>').text(average),
+                                $('<td>').text(Math.round((mark.ese / 100) * 70)),
+                                $('<td>').text(attendance + '%')
+                            );
+                            $('#marks-attendance-container').append(row);
+                            averageSum += average;
+                            eseTotal += Math.round((mark.ese / 100) * 70);
+                            subjects.push(mark.subject);
+                            mid1Data.push(mark.mid1);
+                            mid2Data.push(mark.mid2);
+                            eseData.push(Math.round((mark.ese / 100) * 70));
+                            attendanceSum += attendance;
+                        });
+                        var attendanceaverage = Math.round(attendanceSum / totalStudents);
+                        var totalMarks = averageSum + eseTotal;
+                        var percentage = (totalMarks / (totalStudents * 100)) * 100;
+                        $('#percentage').text('Percentage: ' + percentage.toFixed(2) + '%');
+                        var ctx = document.getElementById('marks-chart').getContext('2d');
+                        function generateColors(numColors) {
+                            const colors = [];
+                            for (let i = 0; i < numColors; i++) {
+                                const hue = (i * 360) / numColors;
+                                colors.push(`hsla(${hue}, 70%, 50%, 0.5)`);
+                            }
+                            return colors;
+                        }
+                        const numSubjects = subjects.length;
+                        const colors = generateColors(numSubjects);
+                        var marksChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: subjects,
+                                datasets: [
+                                    {
+                                        label: 'Mid1 Marks',
+                                        data: mid1Data,
+                                        backgroundColor: colors,
+                                    },
+                                    {
+                                        label: 'Mid2 Marks',
+                                        data: mid2Data,
+                                        backgroundColor: colors,
+                                    },
+                                    {
+                                        label: 'ESE Marks',
+                                        data: eseData,
+                                        backgroundColor: colors,
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                title: {
+                                    display: true,
+                                    text: 'Mid1, Mid2, and ESE Marks'
+                                }
+                            }
+                        });
+                        var totalsRow = $('<tr>').append(
+                            $('<td>').text('Total'),
+                            $('<td>').text(''),
+                            $('<td>').text(''),
+                            $('<td>').text(averageSum.toFixed(2)),
+                            $('<td>').text(eseTotal.toFixed(2)),
+                            $('<td>').text(attendanceaverage + '%')
+                        );
+                        $('#marks-attendance-container').append(totalsRow);
+                        predictPerformance(percentage, attendanceaverage, totalStudents);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching student attendance:', error);
+                        $('#marks-attendance-container').text('Error fetching student attendance. Please try again later.');
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching student marks:', error);
+                $('#marks-attendance-container').text('Error fetching student marks. Please try again later.');
+            }
+        });
+
+        var eventsArray = [];
+        $.get('/fetch-events', function (events) {
+            if (events.length === 0) {
+                eventsArray.push('No events found for the student');
+            } else {
+                events.forEach(event => {
+                    eventsArray.push(event.events);
+                });
+            }
+            displayEvents(eventsArray);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.error('Error fetching events:', errorThrown);
+            alert('Error fetching events. Please try again later.');
+        });
+        function displayEvents(eventsArray) {
+            $('#eventsList').empty();
+            eventsArray.forEach(event => {
+                $('#eventsList').append($('<li>', {
+                    class: 'list-group-item',
+                    text: event
+                }));
+            });
+        }
+        function predictPerformance(percentage, attendanceaverage, totalStudents) {
+            const weightPercentage = 0.6;
+            const weightAttendance = 0.3;
+            const weightEvents = 0.1;
+            const overallScore = (percentage * weightPercentage) + (attendanceaverage * weightAttendance) + (eventsArray * weightEvents);
+            let performance;
+            if (overallScore >= 80) {
+                performance = 'Excellent';
+            } else if (overallScore >= 60) {
+                performance = 'Good';
+            } else if (overallScore >= 40) {
+                performance = 'Average';
+            } else {
+                performance = 'Poor';
+            }
+            $('#predicted-performance').text('Predicted Performance: ' + overallScore.toFixed(2) + '%  (' + performance + ')');
+        }
+    });
+</script>
+
+<script>
+    function w3_open() {
+        document.getElementById("main").style.marginLeft = "250px";
+        document.getElementById("mySidebar").style.width = "250px";
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("openNav").style.display = 'none';
+    }
+    function w3_close() {
+        document.getElementById("main").style.marginLeft = "0";
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("openNav").style.display = "inline-block";
+    }
+</script>
+
+</body>
+
+</html>

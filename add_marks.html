@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Marks</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        tr:hover {background-color: rgb(14, 248, 240);}
+    </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .w3-sidebar {
+            height: 100%;
+            width: 250px;
+            background-color: #343a40;
+            color: #fff;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            display: none; /* Initially hidden */
+        }
+        
+        .w3-sidebar a {
+            padding: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: 0.3s;
+        }
+        
+        .w3-sidebar a:hover {
+            background-color: #007bff;
+            color: #fff !important;
+        }
+        
+        .w3-sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            font-size: 24px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        
+        #main {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+        
+        @media screen and (max-height: 450px) {
+            .w3-sidebar {
+                padding-top: 15px;
+            }
+            .w3-sidebar a {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="w3-sidebar w3-bar-block w3-card w3-animate-left" id="mySidebar">
+    <button class="w3-bar-item w3-button w3-large close-btn" onclick="w3_close()">&times;</button>
+    <a href="/time-table" class="w3-bar-item w3-button">Time Table</a>
+    <a href="/add-marks" class="w3-bar-item w3-button">Add Marks</a>
+    <a href="/result" class="w3-bar-item w3-button">Result</a>
+    <a href="/register-student-page" class="w3-bar-item w3-button">Register a New Student</a>
+    <a href="/Attendance-page" class="w3-bar-item w3-button">Attendance</a>
+    <a href="/events" class="w3-bar-item w3-button">Events</a>
+</div>
+
+<div id="main">
+    <div class="w3-teal">
+        <button id="openNav" class="w3-button w3-teal w3-xlarge" onclick="w3_open()">&#9776;</button>
+        <div class="w3-container">
+            
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <h1 class="text-center mt-5 mb-4">Add Marks</h1>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Username</th>
+                        <th>MID1</th>
+                        <th>MID2</th>
+                        <th>ESE</th>
+                    </tr>
+                </thead>
+                <tbody id="student-marks-body">
+                   
+                </tbody>
+            </table>
+        </div>
+
+        <button id="add-marks-btn" class="btn btn-primary btn-block">Add Marks</button>
+       
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        
+        function validateMarks(marksData) {
+            for (const mark of marksData) {
+                const { mid1, mid2, ese } = mark;
+                if (mid1 === '' || mid2 === '' || ese === '') {
+                    alert('All marks are required');
+                    return false;
+                }
+                if (mid1 < 0 || mid1 > 30 || mid2 < 0 || mid2 > 30 || ese < 0 || ese > 100) {
+                    alert('Marks should be within the range:\nMID1: 0-30\nMID2: 0-30\nESE: 0-100');
+                    return false;
+                }
+            }
+            return true;
+        }
+    
+        fetch('/fetch-student-usernames')
+            .then(response => response.json())
+            .then(usernames => {
+                const studentMarksBody = document.getElementById('student-marks-body');
+                studentMarksBody.innerHTML = '';
+    
+                usernames.forEach(username => {
+                    const row = document.createElement('tr');
+    
+                    const usernameCell = document.createElement('td');
+                    usernameCell.textContent = username;
+    
+                    const mid1Cell = document.createElement('td');
+                    const mid1Input = document.createElement('input');
+                    mid1Input.type = 'number';
+                    mid1Input.value = '';
+                    mid1Input.name = `mid1_${username}`;
+                    mid1Cell.appendChild(mid1Input);
+    
+                    const mid2Cell = document.createElement('td');
+                    const mid2Input = document.createElement('input');
+                    mid2Input.type = 'number';
+                    mid2Input.value = '';
+                    mid2Input.name = `mid2_${username}`;
+                    mid2Cell.appendChild(mid2Input);
+    
+                    const eseCell = document.createElement('td');
+                    const eseInput = document.createElement('input');
+                    eseInput.type = 'number';
+                    eseInput.value = '';
+                    eseInput.name = `ese_${username}`;
+                    eseCell.appendChild(eseInput);
+    
+                    row.appendChild(usernameCell);
+                    row.appendChild(mid1Cell);
+                    row.appendChild(mid2Cell);
+                    row.appendChild(eseCell);
+    
+                    studentMarksBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching student usernames:', error);
+            });
+    
+        const addMarksBtn = document.getElementById('add-marks-btn');
+        addMarksBtn.addEventListener('click', async () => {
+            const marksData = [];
+            const rows = document.querySelectorAll('#student-marks-body tr');
+    
+            rows.forEach(row => {
+                const username = row.cells[0].textContent;
+                const mid1 = row.cells[1].querySelector('input').value;
+                const mid2 = row.cells[2].querySelector('input').value;
+                const ese = row.cells[3].querySelector('input').value;
+    
+                marksData.push({ username, mid1, mid2, ese });
+            });
+    
+            if (validateMarks(marksData)) {
+                try {
+                    const response = await fetch('/add-marks', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ marks: marksData })
+                    });
+    
+                    if (response.ok) {
+                        alert('Marks added successfully');
+                    } else {
+                        alert('Failed to add marks');
+                    }
+                } catch (error) {
+                    console.error('Error adding marks:', error);
+                    alert('Failed to add marks. Please try again later.');
+                }
+            }
+        });
+    
+    </script>
+
+    <script>
+        function w3_open() {
+            document.getElementById("main").style.marginLeft = "250px";
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("mySidebar").style.display = "block";
+            document.getElementById("openNav").style.display = 'none';
+        }
+        function w3_close() {
+            document.getElementById("main").style.marginLeft = "0";
+            document.getElementById("mySidebar").style.display = "none";
+            document.getElementById("openNav").style.display = "inline-block";
+        }
+    </script>
+</body>
+</html>

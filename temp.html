@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Marks</title>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h1 class="card-title">Student Marks</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Mid1</th>
+                                        <th>Mid2</th>
+                                        <th>Average</th>
+                                        <th>ESE (out of 70)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marks-container">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-6">
+                                        <div class="card bg-primary text-white text-center p-3">
+                                            <h5 class="card-title">Percentage</h5>
+                                            <p class="card-text" id="percentage"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Decrease the size of the canvas for the pie chart -->
+                        <canvas id="marks-chart" width="100" height="100"></canvas>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                type: "GET",
+                url: "/student-marks",
+                success: function(data) {
+                    $('#marks-container').empty();
+    
+                    var averageSum = 0;
+                    var eseTotal = 0;
+    
+                    var mid1Data = [];
+                    var mid2Data = [];
+                    var eseData = [];
+    
+                    var subjects = [];
+    
+                    data.forEach(function(mark) {
+                        var average = Math.round((mark.mid1 + mark.mid2) / 2); // Round the average marks to integers
+                        var row = $('<tr>').append(
+                            $('<td>').text(mark.subject),
+                            $('<td>').text(mark.mid1),
+                            $('<td>').text(mark.mid2),
+                            $('<td>').text(average), // Display the rounded average marks
+                            $('<td>').text(Math.round((mark.ese / 100) * 70))
+                        );
+                        $('#marks-container').append(row);
+    
+                        averageSum += average;
+                        eseTotal += Math.round((mark.ese / 100) * 70);
+    
+                        subjects.push(mark.subject);
+                        mid1Data.push(mark.mid1);
+                        mid2Data.push(mark.mid2);
+                        eseData.push(Math.round((mark.ese / 100) * 70));
+                    });
+    
+                    var totalSubjects = data.length;
+                    var totalMarks = averageSum + eseTotal;
+                    var percentage = (totalMarks / (totalSubjects * 100)) * 100;
+    
+                    $('#percentage').text('Percentage: ' + percentage.toFixed(2) + '%');
+    
+                    // Create pie chart
+                    var ctx = document.getElementById('marks-chart').getContext('2d');
+                    var marksChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: subjects,
+                            datasets: [
+                                {
+                                    label: 'Mid1 Marks',
+                                    data: mid1Data,
+                                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                },
+                                {
+                                    label: 'Mid2 Marks',
+                                    data: mid2Data,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                },
+                                {
+                                    label: 'ESE Marks',
+                                    data: eseData,
+                                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            title: {
+                                display: true,
+                                text: 'Mid1, Mid2, and ESE Marks'
+                            }
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching student marks:', error);
+                    $('#marks-container').text('Error fetching student marks. Please try again later.');
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>

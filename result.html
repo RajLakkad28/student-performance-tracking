@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Usernames</title>
+    
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            font-weight: bold;
+        }
+        #studentDropdown {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        #submitButton {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        #submitButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Usernames</h1>
+        <div class="form-group">
+            <label for="studentDropdown">Select a Student:</label>
+            <select id="studentDropdown" class="form-control">
+                
+            </select>
+        </div>
+        <button id="submitButton" type="button">Submit</button>
+    </div>
+
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            
+            $('#submitButton').click(function() {
+                const selectedUsername = $('#studentDropdown').val();
+               
+                $.post('/store-selected-username', { selectedUsername }, function(response) {
+                    
+                    window.location = '/display-result1';
+                });
+            });
+
+            fetch('/fetch-student-usernames')
+                .then(response => response.json())
+                .then(usernames => {
+                    const studentDropdown = $('#studentDropdown');
+                    usernames.forEach(username => {
+                        studentDropdown.append($('<option>', {
+                            value: username,
+                            text: username
+                        }));
+                    });
+                })
+                .catch(error => console.error('Error fetching student usernames:', error));
+        });
+    </script>
+</body>
+</html>
